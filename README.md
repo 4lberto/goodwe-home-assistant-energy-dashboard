@@ -1,9 +1,13 @@
 # goodwe-home-assistant-energy-dashboard
-Sensors configuration in Home Assistant to display values in the Energy Dashboard
 
-This is working for a Goodwe GW5048D-ES inverter with a Goodwe Lynx home u battery
+## Why?
 
-Prerequisites:
+Because, even though you installed the Goodwe integration into Home Assistant, it is not strightforward to use the values of the Goodwee inverter in the "Energy" dashboard.
+In this guide, you can configure sensors in Home Assistant to display values in the Energy Dashboard
+
+This is working for a **Goodwe GW5048D-ES** inverter with a Goodwe Lynx home u battery. Probably it will work in yours, but maybe you have to adjust the "sensor.on_grid_export_power" Goodwe sensor and use the one provided by your inverter.
+
+### Prerequisites:
 - Have the Goodwe Home Assistant integration installed and working, so all the inverter sensors are read correctly by Home Assitant.
 - Edit the configuration/configuration.yaml file and add the content of the file called "add_to_configuration.yaml" 
 
