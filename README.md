@@ -72,7 +72,7 @@ sensor:
 
 Now **RESTART** Home assistant (Developer Tools -> Restart)
 
-## 1.2. Create sensors that transforms from kW to kWh 
+### 1.2. Create sensors that transforms from kW to kWh 
 
 Continue editing configuration.yaml and add this code to the sensor parte:
 
