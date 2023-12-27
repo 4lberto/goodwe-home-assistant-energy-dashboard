@@ -1,13 +1,22 @@
 # goodwe-home-assistant-energy-dashboard
 Sensors configuration in Home Assistant to display values in the Energy Dashboard
 
-* This is working for a Goodwe GW5048D-ES inverter with a Goodwe Lynx home u battery
+This is working for a Goodwe GW5048D-ES inverter with a Goodwe Lynx home u battery
 
-## Sensors creation
 Prerequisites:
-- Have the Goodwe Home Assistant extension installed and working, so all the inverter sensors are read correctly by Home Assitant.
+- Have the Goodwe Home Assistant integration installed and working, so all the inverter sensors are read correctly by Home Assitant.
 - Edit the configuration/configuration.yaml file and add the content of the file called "add_to_configuration.yaml" 
 
+
+## 1. Sensors to transform from kW -> kWh
+
+Energy panel needs:
+- Sepparated sensors for buying and selling energy from the grid, and the same for the energy charged or discharged from the battery. Since Goodwe integration only provides 1 sensor for grid and other of battery with positive and negative values, it is neccesary to split them in two different sensors.
+- Sensors that provide data in kWh and not kW. This means that we have to use Riemann sum to incorporate the "h" to the kWh
+
+### 1.1. Split grid sensor into buy and sell + Split battery (if you have) into charge and discharge
+
+Just edit your configuration.yaml and add this:
 
 ```
 sensor:
@@ -59,6 +68,17 @@ sensor:
           {% else %}
             {{ 0 }}
           {% endif %}
+```
+
+Now **RESTART** Home assistant (Developer Tools -> Restart)
+
+## 1.2. Create sensors that transforms from kW to kWh 
+
+Continue editing configuration.yaml and add this code to the sensor parte:
+
+
+```
+#Continue from the code block above... Please, keep the indentation
 
   # Sensor for Riemann sum of energy bought (W -> Wh)
   - platform: integration
@@ -93,6 +113,9 @@ sensor:
     unit_prefix: k
     round: 1
     method: left
+
+```
+
 
 utility_meter:
   energy_buy_daily:
