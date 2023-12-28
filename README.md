@@ -14,7 +14,7 @@ Source: https://github.com/mletenay/home-assistant-goodwe-inverter
 - Edit the configuration/configuration.yaml file and add the content of the file called "add_to_configuration.yaml" 
 
 
-## 1. Sensors to transform from kW -> kWh
+## 1. Create new Sensors
 
 Energy panel needs:
 - Sepparated sensors for buying and selling energy from the grid, and the same for the energy charged or discharged from the battery. Since Goodwe integration only provides 1 sensor for grid and other of battery with positive and negative values, it is neccesary to split them in two different sensors.
