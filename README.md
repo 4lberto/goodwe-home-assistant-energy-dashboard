@@ -169,3 +169,10 @@ utility_meter:
     cycle: monthly
 ```
 
+## 2. Configure Energy Panel
+
+Just go to **Settings > Dashboard > Energy** and use the new sensors.
+
+Here is my configuration:
+
+<img src="https://github.com/4lberto/goodwe-home-assistant-energy-dashboard/blob/main/energy_panel.png?raw=true">
