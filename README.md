@@ -171,6 +171,11 @@ utility_meter:
     cycle: monthly
 ```
 
+
+### 1.4. Restart Home Assitant.
+
+Yes, you have to RESTART Home Assistant to apply the changes, so the sensors appear in the options.
+
 ## 2. Configure Energy Panel
 
 Just go to **Settings > Dashboard > Energy** and use the new sensors.
@@ -178,3 +183,14 @@ Just go to **Settings > Dashboard > Energy** and use the new sensors.
 Here is my configuration:
 
 <img src="https://github.com/4lberto/goodwe-home-assistant-energy-dashboard/blob/main/energy_panel.png?raw=true">
+
+Maybe you want to include the energy price, both for buying and selling from the grid. You have to do it in the specific configuration of each measurement, like this:
+
+<img src="https://github.com/4lberto/goodwe-home-assistant-energy-dashboard/blob/main/energy_grid_config.png?raw=true">
+
+This is the final result:
+
+<img src="https://github.com/4lberto/goodwe-home-assistant-energy-dashboard/blob/main/energy_panel_working.png?raw=true">
+
+
+
