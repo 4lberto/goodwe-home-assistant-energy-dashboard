@@ -7,6 +7,8 @@ In this guide, you can configure sensors in Home Assistant to display values in 
 
 This is working for a **Goodwe GW5048D-ES** inverter with a Goodwe Lynx home u battery. Probably it will work in yours, but maybe you have to adjust the "sensor.on_grid_export_power" Goodwe sensor and use the one provided by your inverter.
 
+Source: https://github.com/mletenay/home-assistant-goodwe-inverter
+
 ### Prerequisites:
 - Have the Goodwe Home Assistant integration installed and working, so all the inverter sensors are read correctly by Home Assitant.
 - Edit the configuration/configuration.yaml file and add the content of the file called "add_to_configuration.yaml" 
@@ -121,6 +123,11 @@ Continue editing configuration.yaml and add this code to the sensor parte:
 ```
 
 
+### 1.3 Add to Utility meters
+
+From the kWh sensors we can create other calculations that can be useful.
+
+```
 utility_meter:
   energy_buy_daily:
     source: sensor.energy_buy_sum
