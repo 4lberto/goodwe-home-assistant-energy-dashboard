@@ -127,7 +127,7 @@ Continue editing configuration.yaml and add this code to the sensor parte:
 
 ### 1.3 Add to Utility meters
 
-From the kWh sensors we can create other calculations that can be useful.
+From the kWh sensors we can create other calculations that can be useful in other Home Assistant places
 
 ```
 utility_meter:
