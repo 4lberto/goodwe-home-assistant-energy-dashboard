@@ -186,7 +186,7 @@ Here is my configuration:
 
 Maybe you want to include the energy price, both for buying and selling from the grid. You have to do it in the specific configuration of each measurement, like this:
 
-<img src="https://github.com/4lberto/goodwe-home-assistant-energy-dashboard/blob/main/energy_grid_config.png?raw=true">
+<img src="https://github.com/4lberto/goodwe-home-assistant-energy-dashboard/blob/main/energy_grid_config.png?raw=true" width="400">
 
 This is the final result:
 
