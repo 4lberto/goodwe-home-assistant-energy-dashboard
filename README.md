@@ -130,7 +130,6 @@ Continue editing configuration.yaml and add this code to the sensor parte:
     unit_prefix: k
     round: 1
     method: left
-  # Sensor for Riemann sum of energy sold (W -> Wh)
   - platform: integration
     source: sensor.energy_battery_discharge
     name: energy_battery_discharge_sum
