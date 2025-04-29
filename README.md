@@ -32,7 +32,7 @@ sensor:
     sensors:
       # Template sensor for values of energy bought (active_power < 0)
       energy_buy:
-        device_class: energy
+        device_class: power
         friendly_name: "Energy Buy"
         unit_of_measurement: 'W'
           #        state_class: measurement
@@ -42,9 +42,10 @@ sensor:
           {% else %}
             {{ 0 }}
           {% endif %}
+        availability_template: "{{ states('sensor.on_grid_export_power') not in ['unknown', 'unavailable'] }}"
       # Template sensor for values of energy sold (active_power > 0)
       energy_sell:
-        device_class: energy
+        device_class: power
         friendly_name: "Energy Sell"
         unit_of_measurement: 'W'
           #        state_class: measurement
@@ -54,9 +55,9 @@ sensor:
           {% else %}
             {{ 0 }}
           {% endif %}
-
+        availability_template: "{{ states('sensor.on_grid_export_power') not in ['unknown', 'unavailable'] }}"
       energy_battery_charge:
-        device_class: energy
+        device_class: power
         friendly_name: "Energy Battery Charge"
         unit_of_measurement: 'W'
         value_template: >-
@@ -65,9 +66,10 @@ sensor:
           {% else %}
             {{ 0 }}
           {% endif %}
+        availability_template: "{{ states('sensor.battery_power') not in ['unknown', 'unavailable'] }}"
       # Template sensor for values of energy sold (active_power > 0)
       energy_battery_discharge:
-        device_class: energy
+        device_class: power
         friendly_name: "Energy Battery Discharge"
         unit_of_measurement: 'W'
         value_template: >-
@@ -76,6 +78,26 @@ sensor:
           {% else %}
             {{ 0 }}
           {% endif %}
+        availability_template: "{{ states('sensor.battery_power') not in ['unknown', 'unavailable'] }}"
+      house_consumption:
+        device_class: power
+        friendly_name: "House Consumption"
+        unit_of_measurement: 'W'
+        value_template: >-
+          {{
+            (states('sensor.pv_power')|float(0))
+            + (states('sensor.energy_buy')|float(0))
+            + (states('sensor.energy_battery_discharge')|float(0))
+            - (states('sensor.energy_sell')|float(0))
+            - (states('sensor.energy_battery_charge')|float(0))
+          }}
+        availability_template: >-
+          {{ states('sensor.pv_power') not in ['unknown', 'unavailable']
+             and states('sensor.energy_buy') not in ['unknown', 'unavailable']
+             and states('sensor.energy_battery_discharge') not in ['unknown', 'unavailable']
+             and states('sensor.energy_sell') not in ['unknown', 'unavailable']
+             and states('sensor.energy_battery_charge') not in ['unknown', 'unavailable']
+          }}
 ```
 
 Now **RESTART** Home assistant (Developer Tools -> Restart)
@@ -118,6 +140,12 @@ Continue editing configuration.yaml and add this code to the sensor parte:
   - platform: integration
     source: sensor.pv_power
     name: pv_power_sum
+    unit_prefix: k
+    round: 1
+    method: left
+  - platform: integration
+    source: sensor.house_consumption
+    name: house_consumption_sum
     unit_prefix: k
     round: 1
     method: left
@@ -164,10 +192,10 @@ utility_meter:
     cycle: monthly
 
   pv_energy_daily:
-    source: sensor.pv_power
+    source: sensor.pv_power_sum
     cycle: daily
   pv_energy_monthly:
-    source: sensor.pv_power
+    source: sensor.pv_power_sum
     cycle: monthly
 ```
 
