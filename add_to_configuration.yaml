@@ -1,60 +1,74 @@
-sensor:
-  - platform: template
-    sensors:
-      # Template sensor for values of energy bought (active_power < 0)
-      energy_buy:
+# =============================================================================
+# Goodwe Inverter – Home Assistant Energy Dashboard Configuration
+# =============================================================================
+#
+# IMPORTANT: This file uses the modern Home Assistant template syntax.
+# The legacy "sensor: -> platform: template -> sensors:" format has been
+# deprecated and will be removed in HA 2026.6.
+#
+# Add the relevant blocks below to your configuration.yaml exactly as shown.
+# Only ONE top-level "template:" and ONE top-level "sensor:" key may exist
+# in configuration.yaml. If you already have them, merge the contents.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# 1) TEMPLATE SENSORS (modern syntax)
+# -----------------------------------------------------------------------------
+template:
+  - sensor:
+      - name: "Energy Buy"
+        unique_id: energy_buy
         device_class: power
-        friendly_name: "Energy Buy"
-        unit_of_measurement: 'W'
-          #        state_class: measurement
-        value_template: >-
+        unit_of_measurement: "W"
+        state: >
           {% if states('sensor.on_grid_export_power')|float < 0 %}
             {{ states('sensor.on_grid_export_power')|float * -1 }}
           {% else %}
             {{ 0 }}
           {% endif %}
-        availability_template: "{{ states('sensor.on_grid_export_power') not in ['unknown', 'unavailable'] }}"
-      # Template sensor for values of energy sold (active_power > 0)
-      energy_sell:
+        availability: "{{ states('sensor.on_grid_export_power') not in ['unknown', 'unavailable'] }}"
+
+      - name: "Energy Sell"
+        unique_id: energy_sell
         device_class: power
-        friendly_name: "Energy Sell"
-        unit_of_measurement: 'W'
-          #        state_class: measurement
-        value_template: >-
+        unit_of_measurement: "W"
+        state: >
           {% if states('sensor.on_grid_export_power')|float > 0 %}
             {{ states('sensor.on_grid_export_power')|float }}
           {% else %}
             {{ 0 }}
           {% endif %}
-        availability_template: "{{ states('sensor.on_grid_export_power') not in ['unknown', 'unavailable'] }}"
-      energy_battery_charge:
+        availability: "{{ states('sensor.on_grid_export_power') not in ['unknown', 'unavailable'] }}"
+
+      - name: "Energy Battery Charge"
+        unique_id: energy_battery_charge
         device_class: power
-        friendly_name: "Energy Battery Charge"
-        unit_of_measurement: 'W'
-        value_template: >-
+        unit_of_measurement: "W"
+        state: >
           {% if states('sensor.battery_power')|float < 0 %}
             {{ states('sensor.battery_power')|float * -1 }}
           {% else %}
             {{ 0 }}
           {% endif %}
-        availability_template: "{{ states('sensor.battery_power') not in ['unknown', 'unavailable'] }}"
-      # Template sensor for values of energy sold (active_power > 0)
-      energy_battery_discharge:
+        availability: "{{ states('sensor.battery_power') not in ['unknown', 'unavailable'] }}"
+
+      - name: "Energy Battery Discharge"
+        unique_id: energy_battery_discharge
         device_class: power
-        friendly_name: "Energy Battery Discharge"
-        unit_of_measurement: 'W'
-        value_template: >-
+        unit_of_measurement: "W"
+        state: >
           {% if states('sensor.battery_power')|float > 0 %}
             {{ states('sensor.battery_power')|float }}
           {% else %}
             {{ 0 }}
           {% endif %}
-        availability_template: "{{ states('sensor.battery_power') not in ['unknown', 'unavailable'] }}"
-      house_consumption:
+        availability: "{{ states('sensor.battery_power') not in ['unknown', 'unavailable'] }}"
+
+      - name: "House Consumption"
+        unique_id: house_consumption
         device_class: power
-        friendly_name: "House Consumption"
-        unit_of_measurement: 'W'
-        value_template: >-
+        unit_of_measurement: "W"
+        state: >
           {{
             (states('sensor.pv_power')|float(0))
             + (states('sensor.energy_buy')|float(0))
@@ -62,7 +76,7 @@ sensor:
             - (states('sensor.energy_sell')|float(0))
             - (states('sensor.energy_battery_charge')|float(0))
           }}
-        availability_template: >-
+        availability: >
           {{ states('sensor.pv_power') not in ['unknown', 'unavailable']
              and states('sensor.energy_buy') not in ['unknown', 'unavailable']
              and states('sensor.energy_battery_discharge') not in ['unknown', 'unavailable']
@@ -70,39 +84,80 @@ sensor:
              and states('sensor.energy_battery_charge') not in ['unknown', 'unavailable']
           }}
 
-  # Sensor for Riemann sum of energy bought (W -> Wh)
+      # -----------------------------------------------------------------------
+      # OPTIONAL: Savings & Amortisation helper sensors
+      # Uncomment and adjust the prices (electricity_buy_price / electricity_sell_price)
+      # to match your local tariffs. The example below assumes:
+      #   - Buy price  = 0.20 EUR/kWh
+      #   - Sell price = 0.05 EUR/kWh
+      # -----------------------------------------------------------------------
+      # - name: "Grid Buy Cost"
+      #   unique_id: grid_buy_cost
+      #   device_class: monetary
+      #   unit_of_measurement: "EUR"
+      #   state: "{{ states('sensor.energy_buy_daily')|float(0) * 0.20 }}"
+      #   availability: "{{ states('sensor.energy_buy_daily') not in ['unknown', 'unavailable'] }}"
+      #
+      # - name: "Grid Sell Revenue"
+      #   unique_id: grid_sell_revenue
+      #   device_class: monetary
+      #   unit_of_measurement: "EUR"
+      #   state: "{{ states('sensor.energy_sell_daily')|float(0) * 0.05 }}"
+      #   availability: "{{ states('sensor.energy_sell_daily') not in ['unknown', 'unavailable'] }}"
+      #
+      # - name: "PV Self Consumption Savings"
+      #   unique_id: pv_self_consumption_savings
+      #   device_class: monetary
+      #   unit_of_measurement: "EUR"
+      #   state: >
+      #     {{
+      #       (
+      #         states('sensor.energy_buy_daily')|float(0)
+      #         + states('sensor.house_consumption_daily')|float(0)
+      #         - states('sensor.energy_sell_daily')|float(0)
+      #       ) * 0.20
+      #     }}
+      #   availability: "{{ states('sensor.energy_buy_daily') not in ['unknown', 'unavailable'] }}"
+
+# -----------------------------------------------------------------------------
+# 2) INTEGRATION SENSORS (Riemann sum – W to kWh)
+# -----------------------------------------------------------------------------
+sensor:
   - platform: integration
     source: sensor.energy_buy
     name: energy_buy_sum
     unit_prefix: k
     round: 1
     method: left
-  # Sensor for Riemann sum of energy sold (W -> Wh)
+
   - platform: integration
     source: sensor.energy_sell
     name: energy_sell_sum
     unit_prefix: k
     round: 1
     method: left
+
   - platform: integration
     source: sensor.energy_battery_charge
     name: energy_battery_charge_sum
     unit_prefix: k
     round: 1
     method: left
-  # Sensor for Riemann sum of energy sold (W -> Wh)
+
   - platform: integration
     source: sensor.energy_battery_discharge
     name: energy_battery_discharge_sum
     unit_prefix: k
     round: 1
     method: left
+
   - platform: integration
     source: sensor.pv_power
     name: pv_power_sum
     unit_prefix: k
     round: 1
     method: left
+
   - platform: integration
     source: sensor.house_consumption
     name: house_consumption_sum
@@ -110,6 +165,9 @@ sensor:
     round: 1
     method: left
 
+# -----------------------------------------------------------------------------
+# 3) UTILITY METERS (daily / monthly cycle)
+# -----------------------------------------------------------------------------
 utility_meter:
   energy_buy_daily:
     source: sensor.energy_buy_sum
@@ -117,12 +175,14 @@ utility_meter:
   energy_buy_monthly:
     source: sensor.energy_buy_sum
     cycle: monthly
+
   energy_sell_daily:
     source: sensor.energy_sell_sum
     cycle: daily
   energy_sell_monthly:
     source: sensor.energy_sell_sum
     cycle: monthly
+
   house_consumption_daily:
     source: sensor.house_consumption_sum
     cycle: daily
@@ -136,6 +196,7 @@ utility_meter:
   energy_battery_charge_monthly:
     source: sensor.energy_battery_charge_sum
     cycle: monthly
+
   energy_battery_discharge_daily:
     source: sensor.energy_battery_discharge_sum
     cycle: daily
